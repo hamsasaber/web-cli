@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Embedded CLI</title>
+    <link rel="stylesheet" href="https://unpkg.com/xterm/css/xterm.css" />
+    <style>
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        font-family: "Consolas", "Courier New", monospace;
+      }
+
+      /* Theme Styles */
+      .dark-theme {
+        background-color: #111;
+        color: #ddd;
+      }
+
+      .dark-theme #top-bar {
+        background: #222;
+        border-bottom: 2px solid #444;
+      }
+
+      .dark-theme #top-bar button {
+        background: transparent;
+        color: #ddd;
+      }
+
+      .dark-theme #terminal {
+        background-color: #000;
+        color: white;
+      }
+
+      .dark-theme #history.panel {
+        background: #1e1e1e;
+        color: #ccc;
+        border-top: 2px solid #444;
+      }
+
+      .dark-theme .history-entry pre {
+        background: #000;
+      }
+
+      .light-theme {
+        background-color: #f9f9f9;
+        color: #000;
+      }
+
+      .light-theme #top-bar {
+        background: #eee;
+        border-bottom: 2px solid #ccc;
+      }
+
+      .light-theme #top-bar button {
+        background: transparent;
+        color: #000;
+      }
+
+      .light-theme #terminal {
+        background-color: #fff;
+        color: #000;
+      }
+
+      .light-theme #history.panel {
+        background: #fafafa;
+        color: #000;
+        border-top: 2px solid #ccc;
+      }
+
+      .light-theme .history-entry pre {
+        background: #f0f0f0;
+      }
+
+      /* Top Bar */
+      #top-bar {
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .icon-bar {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .icon-btn {
+        border: none;
+        cursor: pointer;
+        font-size: 20px;
+        background: none;
+        position: relative;
+      }
+
+      .icon-btn:hover::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: -35px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #333;
+        color: #fff;
+        z-index: 1;
+        padding: 6px 10px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 500;
+        white-space: nowrap;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        opacity: 0;
+        pointer-events: none;
+        animation: fadeIn 0.2s forwards;
+      }
+
+      .icon-btn:hover::before {
+        content: "";
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-width: 6px;
+        border-style: solid;
+        border-color: #333 transparent transparent transparent;
+        opacity: 0;
+        animation: fadeIn 0.2s forwards;
+      }
+
+      @keyframes fadeIn {
+        to {
+          opacity: 1;
+        }
+      }
+      .title {
+        font-weight: bold;
+        font-size: 20px;
+      }
+
+      /* Terminal + History Panels */
+      #terminal {
+        width: 100%;
+        height: 100vh;
+        outline: none;
+        padding: 10px;
+        box-sizing: border-box;
+        overflow: auto;
+      }
+
+      #terminal.half {
+        height: 50vh;
+      }
+
+      #history.panel {
+        padding: 10px;
+        height: 50vh;
+        overflow-y: auto;
+        display: none;
+      }
+
+      .history-entry {
+        margin-bottom: 10px;
+      }
+
+      .history-entry code {
+        color: #00c0ff;
+      }
+
+      .history-entry pre {
+        padding: 5px;
+        border-radius: 4px;
+        white-space: pre-wrap;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="top-bar">
+      <div class="icon-bar">
+        <button class="icon-btn" data-tooltip="Help" onclick="showHelp()">
+          💡
+        </button>
+        <button
+          class="icon-btn"
+          data-tooltip="Docs"
+          onclick="window.open('/docs/docs.html', '_blank')"
+        >
+          📄
+        </button>
+        <button class="icon-btn" data-tooltip="History" onclick="showHistory()">
+          🕘
+        </button>
+        <button
+          class="icon-btn"
+          data-tooltip="Toggle Theme"
+          onclick="toggleTheme()"
+        >
+          🌗
+        </button>
+      </div>
+      <div class="title">Calculator CLI</div>
+      <div style="width: 40px"></div>
+      <!-- Spacer -->
+    </div>
+
+    <div id="terminal" tabindex="0"></div>
+    <div id="history" class="panel"></div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://unpkg.com/xterm/lib/xterm.js"></script>
+    <script src="client.js"></script>
+  </body>
+</html>
